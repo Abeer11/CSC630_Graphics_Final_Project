@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <iostream.h>
+#include <fstream.h>
 #include <string.h>
 #include <math.h>
 #include <time.h>
@@ -215,6 +216,97 @@ void camera1()
 			  0.00,0.00,1.00);
 }
 
+void readMap(char* filestr){
+	
+    ifstream fin(filestr);
+	
+    int brick;
+    int counter =0;
+    for (int i=0; i<BRICK_NUMBER_OF_GROUND; i++) {
+        for (int j=-1; j<2; j++) {
+            fin>>brick;
+            if  (brick){
+                groundBricksArray[counter][0] = j*14;
+                groundBricksArray[counter++][1] = i*-14;
+            }
+        }
+        //fin>>groundBricksArray[i][0]>>groundBricksArray[i][1]>>groundBricksArray[i][2];
+    }
+    fin.close();
+}
+void generateGround(void)
+{
+    readMap("mapdata");
+	//	for(int i= 0 ;i<BRICK_NUMBER_OF_GROUND; i++)
+	//	{	
+	//		random1= rand()%5;
+	//		
+	//		if(random1==1)
+	//		{
+	//			groundBricksArray[i][0]=-14;
+	//			groundBricksArray[i][1]=counter;
+	//			i++;
+	//			groundBricksArray[i][0]=0;
+	//			groundBricksArray[i][1]=counter;
+	//		}
+	//		
+	//		else if(random1==2)
+	//		{
+	//			groundBricksArray[i][0]=0;
+	//			groundBricksArray[i][1]=counter;
+	//			i++;
+	//			groundBricksArray[i][0]=14;
+	//			groundBricksArray[i][1]=counter;
+	//			
+	//		}
+	//		
+	//		else if(random1==3)
+	//		{
+	//			groundBricksArray[i][0]=14;
+	//			groundBricksArray[i][1]=counter;
+	//			
+	//		}
+	//		
+	//		else  
+	//		{
+	//			groundBricksArray[i][0]=-14;
+	//			groundBricksArray[i][1]=counter;
+	//			i++;
+	//			groundBricksArray[i][0]=0;
+	//			groundBricksArray[i][1]=counter;
+	//			i++;
+	//			groundBricksArray[i][0]=14;
+	//			groundBricksArray[i][1]=counter;
+	//			
+	//		}
+	//		
+	//		counter+=14;
+	//	}
+	
+}
+
+void generateCoins(void){
+	
+}
+
+//to set the values of the ground coodinate, and then draw it.
+void ground()
+{
+	for(int i=0; i<BRICK_NUMBER_OF_GROUND; i++)
+	{
+		//        for (int j=0; j<3; j++) {
+		//            if (groundBricksArray[i][j]==SOLID) {
+		glPushMatrix();
+		glTranslatef(groundBricksArray[i][0], groundBricksArray[i][1], -7);
+		glutSolidCube1(BRICK_SIZE);
+		glPopMatrix();
+		//            }
+		//        }
+	}
+	
+}
+
+
 //this func to draw the PinkBall
 void drawPinkBall() 
 {
@@ -252,73 +344,6 @@ void drawPinkBall()
 		glPopMatrix();
 	glPopMatrix();
 	
-	
-}
-
-void generateGround(void)
-{
-	for(int i= 0 ;i<BRICK_NUMBER_OF_GROUND; i++)
-	{	
-		random1= rand()%5;
-		
-		if(random1==1)
-		{
-			groundBricksArray[i][0]=-14;
-			groundBricksArray[i][1]=counter;
-			i++;
-			groundBricksArray[i][0]=0;
-			groundBricksArray[i][1]=counter;
-		}
-		
-		else if(random1==2)
-		{
-			groundBricksArray[i][0]=0;
-			groundBricksArray[i][1]=counter;
-			i++;
-			groundBricksArray[i][0]=14;
-			groundBricksArray[i][1]=counter;
-			
-		}
-		
-		else if(random1==3)
-		{
-			groundBricksArray[i][0]=14;
-			groundBricksArray[i][1]=counter;
-			
-		}
-		
-		else  
-		{
-			groundBricksArray[i][0]=-14;
-			groundBricksArray[i][1]=counter;
-			i++;
-			groundBricksArray[i][0]=0;
-			groundBricksArray[i][1]=counter;
-			i++;
-			groundBricksArray[i][0]=14;
-			groundBricksArray[i][1]=counter;
-			
-		}
-		
-		counter+=14;
-	}
-}
-
-void generateCoins(void){
-	
-}
-
-//to set the values of the ground coodinate, and then draw it.
-void ground()
-{
-	for(int i=0; i<BRICK_NUMBER_OF_GROUND; i++)
-	{
-		glPushMatrix();
-		glTranslatef(groundBricksArray[i][0], groundBricksArray[i][1], -7);
-		glutSolidCube1(BRICK_SIZE);
-		glPopMatrix();
-		
-	}
 	
 }
 
@@ -384,7 +409,7 @@ void coins()
 	glLightfv (GL_LIGHT0, GL_SPECULAR, SpecularLight); 
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,coinColor );
 	glPushMatrix();
-	glTranslatef(-3, 1, 2);
+	//glTranslatef(-3, 1, 2);
 	glPushMatrix();
 	glRotatef(-90, ROTATE_ON_X, 0, 0);
 	glColor3f(1,.8,0);
@@ -928,10 +953,11 @@ void specialKeys(int key, int x, int y)
 		switch (key) 
 	{
         case GLUT_KEY_LEFT  : sideMove= 0.5 ;break;//turn left
-        case GLUT_KEY_RIGHT : sideMove= -0.5 ;break;//turn right
-        case GLUT_KEY_UP    :
-			break;
-        case GLUT_KEY_DOWN  : 
+        case GLUT_KEY_RIGHT : sideMove= -0.5;break;//turn right
+        case GLUT_KEY_UP    : velocity-=0.05;break;//increase the velocity(it
+							//is in negative value, because the ball heading 
+							//toward the negative y
+        case GLUT_KEY_DOWN  :  velocity+=0.05;break;//decrease the velocity value.
 			break;
     }
 }
