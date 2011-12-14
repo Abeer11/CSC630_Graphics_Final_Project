@@ -802,6 +802,7 @@ void liveSquare()
 	glEnd();
 	
 }	
+//draw lives icons
 void remainingLives(int lives)
 {
 	
