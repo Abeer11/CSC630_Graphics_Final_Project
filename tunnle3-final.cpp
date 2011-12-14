@@ -104,7 +104,7 @@ float PI=3.14159265;
 
 float xMouse=0.50, yMouse=0.60;
 
-float velocity =-0.1;	//the amount of velocity
+float velocity =-0.3;	//the amount of velocity
 
 bool pauseScreen=false;	//is it in a pause condition or not?
 
@@ -319,12 +319,12 @@ static void drawBox(GLfloat size, GLenum type)
 {
 	static GLfloat n[6][3] =
 	{
-		{-1.0, 0.0, 0.0},
-		{0.0, 1.0, 0.0},
-		{1.0, 0.0, 0.0},
-		{0.0, -1.0, 0.0},
-		{0.0, 0.0, 1.0},
-		{0.0, 0.0, -1.0}
+		{-1.0,  0.0,  0.0},
+		{ 0.0,  1.0,  0.0},
+		{ 1.0,  0.0,  0.0},
+		{ 0.0, -1.0,  0.0},
+		{ 0.0,  0.0,  1.0},
+		{ 0.0,  0.0, -1.0}
 	};
 	static GLint faces[6][4] =
 	{
@@ -429,7 +429,7 @@ void ribbon(void)
 	
 }
 
-//this func to draw the second ship
+//this func to draw MrBall character
 void drawBall() 
 {
 	glColor3f(1.00, 1.00, 0.30);
@@ -658,7 +658,7 @@ void init()
 }
 
 
-//this to move the ships and camera in the direct ways
+//this function moves MrBall and the camera forward
 void moving()
 {
 	deltaMove=velocity;
@@ -680,10 +680,10 @@ void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	
-    //Draw ground
-	glNormal3d(1.00, 0.00, 0.00);//normalized vector that needs for lighting
+	
 	glBegin(GL_QUADS);
 	glColor3f(0.5, 0.5, 0.5);//the ceiling
+	glNormal3d(1.00, 0.00, 0.00);//normalized vector that needs for lighting
 	glVertex3f(xBeginOfGround,  yBeginOfGround , zBeginOfCeiling);
 	glVertex3f( xEndOfGround,  yBeginOfGround , zBeginOfCeiling);
 	glVertex3f( xEndOfGround,  yEndOfGround, zBeginOfCeiling);
@@ -698,13 +698,14 @@ void display(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	
 	glBegin(GL_QUADS);
+	glNormal3d(0.00, 1.00, 0.00);//normalized vector that needs for lighting
 	glTexCoord2f(0.0, 0.0);
 	glVertex3f(xBeginOfGround, yBeginOfGround, zBeginOfGround);
 	glTexCoord2f(2.0, 0.0);
 	glVertex3f(xBeginOfGround, yBeginOfGround, zBeginOfCeiling);
-	glTexCoord2f(2.0, 100.0);
+	glTexCoord2f(2.0, 50.0);
 	glVertex3f(xBeginOfGround,  yEndOfGround, zBeginOfCeiling);
-	glTexCoord2f(0.0, 100.0);
+	glTexCoord2f(0.0, 50.0);
 	glVertex3f(xBeginOfGround,  yEndOfGround, zBeginOfGround);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
@@ -716,13 +717,14 @@ void display(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	
 	glBegin(GL_QUADS);
+	glNormal3d(0.00, 1.00, 0.00);//normalized vector that needs for lighting
 	glTexCoord2f(0.0, 0.0);
 	glVertex3f( xEndOfGround, yEndOfGround, zBeginOfGround);
 	glTexCoord2f(2.0, 0.0);
 	glVertex3f( xEndOfGround, yEndOfGround, zBeginOfCeiling);
-	glTexCoord2f(2.0, 100.0);
+	glTexCoord2f(2.0, 50.0);
 	glVertex3f( xEndOfGround, yBeginOfGround, zBeginOfCeiling);
-	glTexCoord2f(0.0, 100.0);
+	glTexCoord2f(0.0, 50.0);
 	glVertex3f( xEndOfGround, yBeginOfGround, zBeginOfGround);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
@@ -735,6 +737,7 @@ void display(void)
 	
 	//left part
 	glBegin(GL_QUADS);
+	glNormal3d(0.00, 1.00, 0.00);//normalized vector that needs for lighting
 	glTexCoord2f(0.0, 0.0);
 	glVertex3f( xEndOfGround, yEndOfGround, zBeginOfGround);
 	glTexCoord2f(2.0, 0.0);
@@ -748,6 +751,7 @@ void display(void)
 	//right part
 	
 	glBegin(GL_QUADS);
+	glNormal3d(0.00, 1.00, 0.00);//normalized vector that needs for lighting
 	//glColor3f(0.65, 0.65, 0.6);
 	glTexCoord2f(0.0, 0.0);
 	glVertex3f(xBeginOfGround, yBeginOfGround, zBeginOfGround);
