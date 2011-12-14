@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <iostream.h>
+#include <fstream.h>
 #include <string.h>
 #include <math.h>
 #include <time.h>
@@ -254,54 +255,27 @@ void drawPinkBall()
 	
 	
 }
-
+void readMap(char* filestr){
+    
+    ifstream fin(filestr);
+    
+    int brick;
+    int counter =0;
+    for (int i=0; i<BRICK_NUMBER_OF_GROUND; i++) {
+        for (int j=-1; j<2; j++) {
+            fin>>brick;
+            if  (brick){
+                groundBricksArray[counter][0] = j*14;
+                groundBricksArray[counter++][1] = i*-14;
+            }
+        }
+        //fin>>groundBricksArray[i][0]>>groundBricksArray[i][1]>>groundBricksArray[i][2];
+    }
+    fin.close();
+}
 void generateGround(void)
 {
-	for(int i= 0 ;i<BRICK_NUMBER_OF_GROUND; i++)
-	{	
-		random1= rand()%5;
-		
-		if(random1==1)
-		{
-			groundBricksArray[i][0]=-14;
-			groundBricksArray[i][1]=counter;
-			i++;
-			groundBricksArray[i][0]=0;
-			groundBricksArray[i][1]=counter;
-		}
-		
-		else if(random1==2)
-		{
-			groundBricksArray[i][0]=0;
-			groundBricksArray[i][1]=counter;
-			i++;
-			groundBricksArray[i][0]=14;
-			groundBricksArray[i][1]=counter;
-			
-		}
-		
-		else if(random1==3)
-		{
-			groundBricksArray[i][0]=14;
-			groundBricksArray[i][1]=counter;
-			
-		}
-		
-		else  
-		{
-			groundBricksArray[i][0]=-14;
-			groundBricksArray[i][1]=counter;
-			i++;
-			groundBricksArray[i][0]=0;
-			groundBricksArray[i][1]=counter;
-			i++;
-			groundBricksArray[i][0]=14;
-			groundBricksArray[i][1]=counter;
-			
-		}
-		
-		counter+=14;
-	}
+    readMap("mapdata");
 }
 
 void generateCoins(void){
