@@ -22,8 +22,6 @@
  *	Abeer Rajhi and Xingdong  		
  *************************************************************************/
 
-//SHIPS
-
 //#include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -794,7 +792,16 @@ void display(void)
     glutSwapBuffers();
 }
 
+void liveSquare()
+{
+	glBegin(GL_QUADS);
+	glVertex3f(0,0,0);
+	glVertex3f(0,50,0);
+	glVertex3f(50,50,0);
+	glVertex3f(50,0,0);
+	glEnd();
 	
+}	
 void remainingLives(int lives)
 {
 	
@@ -809,7 +816,8 @@ void remainingLives(int lives)
 	if(lives==3)
 	{
 		
-	}	}
+	}	
+}
 
 void textInfoOnScreen(int collectdCoins)
 {	
