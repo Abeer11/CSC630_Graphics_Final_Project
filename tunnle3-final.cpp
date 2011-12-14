@@ -35,18 +35,23 @@
 //#include <GL/glut.h>
 #include <GLUT/glut.h>
 
-#define SMOOTH_SHADING 1	 /*for shading porpose*/
-#define FLAT_SHADING 2
-#define WIREFRAME 3
+#define WHITE_EYE_BALLRADIUS 0.5	/*radius of eye */
+#define BLACK_EYE_BALLRADIUS 1.8	/*radius of eye */
+#define BALLRADIUS 2				/*radius of eye */
 
-#define IMAGE_WIDTH 100
-#define IMAGE_HEIGHT 100
+#define NO_COINS 8					/*number of coins */
 
-#define SPHERERADIUS 10      /*radius of sphere */
-#define NO_CLOUDS 8          /*number of clouds */
 #define BRICK_SIZE 14
-#define BRICK_NUMBER_OF_GROUND 150
+#define BRICK_NUMBER_OF_GROUND 100
+
 #define Z_HEIGHT 1.9
+
+#define ROTATE_ON_X	1.00
+#define ROTATE_ON_Y	1.00
+#define ROTATE_ON_Z	1.00
+
+#define NO_FACES 30
+#define NO_SIDES 30
 
 #define SOLID 1
 #define HOLE 0
@@ -56,19 +61,11 @@
 
 //==================Function Headers====================//
 
-void  initWindow(void);
+void initWindow(void);
 void generateGround(void);
 void generateCoins(void);
-void  windowMode(void);
-void  printData1(void);
-void  changeSize(int, int);
-void  printData1(void);
-void  drawSpaceShip1(void);
-void  drawSpaceShip2(void);
-void  drawCloud(void);
-void  init(void);
-void  orientMe(float);
-void  moveMe(float,float);
+void changeSize(int, int);
+void init(void);
 void drawHeadPhones(void);
 void display(void); 
 void part1(void);
@@ -77,11 +74,8 @@ void part3(void);
 void createCircle(float radius);
 void face(void);
 void eye(void);
-void mouth(void);
 void ribbon(void);
 void camera1(void);
-void camera2(void);
-void movingGround(void);
 void ground(void);
 void glutSolidCube1(GLdouble);
 void MoveBallForward(int);
@@ -110,7 +104,7 @@ float PI=3.14159265;
 
 float xMouse=0.50, yMouse=0.60;
 
-float velocity =-0.2;	//the amount of velocity
+float velocity =-0.1;	//the amount of velocity
 
 bool pauseScreen=false;	//is it in a pause condition or not?
 
@@ -223,31 +217,31 @@ void drawPinkBall()
 		ribbon();
 	
 		glPushMatrix();
-			glRotatef(90, 0, 0, 1);
+			glRotatef(90, 0, 0, ROTATE_ON_Z);
 			glTranslatef(-0.75, 1.4, 0.8);
 			glColor3f(0, 0, 0);
 			glPushMatrix();
-			glRotatef(80,1,0,0);
-				glutSolidTorus(0.05, 0.5, 20, 40);
+			glRotatef(80,ROTATE_ON_X,0,0);
+				glutSolidTorus(0.05, 0.5, NO_SIDES, NO_FACES);
 			glPopMatrix();
 			eye();
 		glPopMatrix();
 	
 		glPushMatrix();
-			glRotatef(90, 0, 0, 1);
+			glRotatef(90, 0, 0, ROTATE_ON_Z);
 			glTranslatef(0.75, 1.4, 0.8);
 			glPushMatrix();
-			glRotatef(80,1,0,0);
-				glutSolidTorus(0.05, 0.5, 20, 40);
+			glRotatef(80,ROTATE_ON_X,0,0);
+				glutSolidTorus(0.05, 0.5, NO_SIDES, NO_FACES);
 			glPopMatrix();
 			eye();
 		glPopMatrix();
 	
 		glColor3f(1.00, 0.80, 0.80);
-		glRotated(90, 0.0, 0.0, 1.0);
+		glRotated(90, 0.0, 0.0, ROTATE_ON_Z);
 		glPushMatrix();
-			glutSolidSphere(2, 20, 20);//first torus
-			glRotated(90, 0.0, 1.0, .0);	
+			glutSolidSphere(2, NO_SIDES, NO_FACES);//first torus
+			glRotated(90, 0.0, ROTATE_ON_Y, .0);	
 		glPopMatrix();
 	glPopMatrix();
 	
@@ -385,7 +379,7 @@ void coins()
 	glPushMatrix();
 	glTranslatef(-3, 1, 2);
 	glPushMatrix();
-	glRotatef(-90, 1, 0, 0);
+	glRotatef(-90, ROTATE_ON_X, 0, 0);
 	glColor3f(1,.8,0);
 	glPushMatrix();
 	gluQuadricDrawStyle(qobj, GLU_FILL); /* flat shaded */
@@ -397,7 +391,7 @@ void coins()
 	glPushMatrix();
 	glTranslatef(0.00, 0.00, 0.50);
 	glPushMatrix();
-	glRotatef(0, 0, 1, 0);
+	glRotatef(0, 0, ROTATE_ON_Y, 0);
 	
 	
 	createCircle(1);
@@ -418,7 +412,7 @@ void ribbon(void)
 {
 	glPushMatrix();
 	glTranslatef(0, 0, 2);
-	glRotated(10, 0, 1, 1);
+	glRotated(10, 0, ROTATE_ON_Y, ROTATE_ON_Z);
 	glColor3f(1, 0, 0);
 	glPushMatrix();
 	glBegin(GL_TRIANGLES);
@@ -442,10 +436,10 @@ void drawBall()
 	glPushMatrix();
 	glTranslatef(ball_X, ball_Y, ball_Z);//move this object to this value
 	glPushMatrix();
-	glRotated(-rotateAngleToMoveForwad, 1.0, 0.0, 0.0);
+	glRotated(-rotateAngleToMoveForwad, ROTATE_ON_X, 0.0, 0.0);
 	glPushMatrix();
-	glRotated(90, 0.0, 1.0, 0.0);
-	glutSolidSphere(2, 20, 20); //first torus	
+	glRotated(90, 0.0, ROTATE_ON_Y, 0.0);
+	glutSolidSphere(2, NO_SIDES, NO_FACES); //first torus	
 	glPopMatrix();
 	glPopMatrix();
 	glPopMatrix();
@@ -455,7 +449,7 @@ void drawBall()
 	//right eyeBall.
 	glPushMatrix();
 	glTranslatef(ball_X,ball_Y, ball_Z+0.4);
-	glRotatef(ballFacingAngle-17.5, 0.00, 0.00, 1.00);
+	glRotatef(ballFacingAngle-17.5, 0.00, 0.00, ROTATE_ON_Z);
 	glTranslatef(0.0, 1.70, 0.0);//but the eye on the yellow ball
 	eye();
 	glPopMatrix();
@@ -463,7 +457,7 @@ void drawBall()
 	//left eyeBall
 	glPushMatrix();
 	glTranslatef(ball_X,ball_Y, ball_Z+0.4);
-	glRotatef(ballFacingAngle+17.5, 0.00, 0.00, 1.00);
+	glRotatef(ballFacingAngle+17.5, 0.00, 0.00, ROTATE_ON_Z);
 	glTranslatef(0.0, 1.70, 0.0);
 	eye();
 	glPopMatrix();
@@ -498,10 +492,10 @@ void eye(void)
 {
 	//glPushMatrix();
 	glColor3f(1.00, 1.00, 1.00);
-	glutSolidSphere(0.5, 30, 30);//whiteBall
+	glutSolidSphere(0.5, NO_SIDES, NO_FACES);//whiteBall
 	glTranslatef(-xMouse+0.5, +0.35, yMouse-0.5);
 	glColor3f(0.00, 0.00, 0.00);
-	glutSolidSphere(0.18, 20, 10);//blackBall
+	glutSolidSphere(0.18, NO_SIDES, NO_FACES);//blackBall
 	//glPopMatrix();
 	
 	glutPostRedisplay();
@@ -512,7 +506,7 @@ void drawHeadPhones()
 	glColor3f(1, 0, 0);
 	glPushMatrix();
 	glTranslatef(ball_X, ball_Y, ball_Z);
-	glRotatef(ballFacingAngle, 0.00, 0.00, 1.00);
+	glRotatef(ballFacingAngle, 0.00, 0.00, ROTATE_ON_Z);
 	part1();
 	part2();
 	part3();
@@ -523,13 +517,13 @@ void part1(void)
 {
 	double eq[4]={-4, 1, 3, 0};
 	glPushMatrix();
-	glRotated(90, 1.0, 0.0, 0.0);
+	glRotated(90, ROTATE_ON_X, 0.0, 0.0);
 	glPushMatrix();
 	glPushMatrix();
-	glRotated(-78, 0.0, 0.0, 1.0);
+	glRotated(-78, 0.0, 0.0, ROTATE_ON_Z);
 	glEnable(GL_CLIP_PLANE0);
 	glClipPlane(GL_CLIP_PLANE0, eq);
-	glutSolidTorus(0.3, 1.9, 40, 40);
+	glutSolidTorus(0.3, 1.9, NO_SIDES, NO_FACES);
 	glDisable(GL_CLIP_PLANE0);
 	glPopMatrix();
 	glPopMatrix();
@@ -542,15 +536,15 @@ void part2(void)
 	glPushMatrix();
 	glTranslatef((2.00), 0.00, 0.00);
 		glPushMatrix();
-			glRotated(90, 0.0, 1.0, 0.0);
-			glutSolidTorus(0.2, 0.5, 40, 40);
+			glRotated(90, 0.0, ROTATE_ON_Y, 0.0);
+			glutSolidTorus(0.2, 0.5, NO_SIDES, NO_FACES);
 		glPopMatrix();
 	glPopMatrix();
 	glPushMatrix();
 	glTranslatef((-2.00), 0.00, 0.00);
 	glPushMatrix();
-	glRotated(90, 0.0, 1.0, 0.0);
-	glutSolidTorus(0.2, 0.5, 40, 40);
+	glRotated(90, 0.0, ROTATE_ON_Y, 0.0);
+	glutSolidTorus(0.2, 0.5, NO_SIDES, NO_FACES);
 	glPopMatrix();
 	glPopMatrix();
 	
@@ -565,7 +559,7 @@ void part3(void)
 	glPushMatrix();
 	glTranslatef(-2.3, 0.00, 0.00);
 	glPushMatrix();
-	glRotated(90, 0.0, 1.0, 0.0);
+	glRotated(90, 0.0, ROTATE_ON_Y, 0.0);
 	createCircle(0.5);
 	gluCylinder(qobj, 0.5, 0.5, 4.63, 40, 3);
 	glPopMatrix();
@@ -574,7 +568,7 @@ void part3(void)
 	glPushMatrix();
 	glTranslatef(2.33, 0.00, 0.00);
 	glPushMatrix();
-	glRotated(90, 0.0, 1.0, 0.0);
+	glRotated(90, 0.0, ROTATE_ON_Y, 0.0);
 	createCircle(0.5);
 	glPopMatrix();
 	glPopMatrix();
