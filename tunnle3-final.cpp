@@ -79,6 +79,11 @@ void camera1(void);
 void ground(void);
 void glutSolidCube1(GLdouble);
 void MoveBallForward(int);
+void setOrthographicProjection(void);
+void resetPerspectiveProjection(void);
+void renderBitmapString(float, float, void *,char *);
+void textInfoOnScreen(int);
+void remainingLives(int);
 
 //======================================================//
 //===============The gloable variables==================//
@@ -95,6 +100,8 @@ float yEndOfGround=-(BRICK_NUMBER_OF_GROUND*BRICK_SIZE);
 float xEndOfGround=21, zBeginOfCeiling=30.0, zBeginOfGround=0.0;
 float xBeginOfGround=-21, yBeginOfGround=0, zEndOfGround=-14;
 
+char textArray[50];//to stor the text information(the coins
+					//that have been colected 
 
 float counter=-1000;
 
@@ -120,6 +127,8 @@ float	rotateAngleToMoveForwad=1.00;	//the angle
 bool DoneJumping=true;
 
 float	ratio;	//the ratio of window width to its height
+
+void *font=GLUT_BITMAP_9_BY_15;
 
 int button=GLUT_RIGHT_BUTTON;
 
@@ -674,7 +683,6 @@ void moving()
 	camera1();	
 }
 
-
 //the drawing start from here...
 void display(void) 
 {
@@ -774,7 +782,73 @@ void display(void)
 	
 	firstTime=false;
 	
+	glColor3f(1.0, 0.0, 0.0);
+    setOrthographicProjection();
+    glPushMatrix();
+    glLoadIdentity();
+	textInfoOnScreen(30);
+	//remainingLives();
+	glPopMatrix();
+    resetPerspectiveProjection();
+	
     glutSwapBuffers();
+}
+
+	
+void remainingLives(int lives)
+{
+	
+	if(lives==1)
+	{
+		
+	}
+	if(lives==2)
+	{
+		
+	}
+	if(lives==3)
+	{
+		
+	}	}
+
+void textInfoOnScreen(int collectdCoins)
+{	
+	glColor3f(1,1,1);
+	int len, i;
+	char string[30];
+	
+	sprintf(string,"You have :%d.00$", collectdCoins);//to convert the digit into string
+	
+	len = (int) strlen(string);//to get the length of the text
+	
+	glRasterPos2f(20,20);//to set the text position on the screen
+	//======================================================================//
+	
+	for (i = 0; i < len; i++) //this loop to draw our text on the output screen
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, string[i]);
+}
+
+
+void setOrthographicProjection() {
+    
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+	gluOrtho2D(0, w, 0, h);
+    glScalef(1, -1, 1);
+    glTranslatef(0, -h, 0);
+    glMatrixMode(GL_MODELVIEW);
+}
+
+void resetPerspectiveProjection() {
+    
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
 }
 
 /****findme*****/
