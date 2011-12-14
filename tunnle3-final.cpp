@@ -195,7 +195,7 @@ void changeSize(int w1, int h1)
 	camera1();
 	
 }
-
+//move your camera
 void camera1()
 {
 	gluLookAt(ball_X, ball_Y+8, 4.5, 
