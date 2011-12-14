@@ -1,15 +1,26 @@
-/***************************************************************				
- *  Assignment3AbeerRajhi.cpp					*
- *  Assignment3AbeerRajhi						*
- *									*
- *  Created by Abeer Rajhi on 11/15/11.				*
- *  Copyright 2011 SJU. All rights reserved.			*
- *	This program is about 3d invironment and how to apply	*
- *	the viewing camera.	changing the camere position and 	*
- *	and beaming from one amera to another.			*
- *									*
- *	For details check readMe.txt.......			*
- ***************************************************************/
+/*************************************************************************				
+ *									
+ *  Created by Abeer Rajhi on 11/15/11.				
+ *  Copyright 2011 SJU. All rights reserved.			
+ *	This is the program represents ours final project in the CSC 630.
+ *	The project is a 3d game that takes a place in a tunnel some where
+ *	in the fantasy world. the project is a combination between physics' 
+ *	formulas and graphical generating images.  This project implements
+ *	most the points that is covered in this course along with what we 
+ *	learned through searching. Here some of the implementation we have:
+ *		1-viewing.
+ *		2-using the geometric objects.
+ *		3-color and materials(state mangments).
+ *		4-light and shading.
+ *		5-texture mapping.
+ *		6-transformation matrices.
+ *		
+ *
+ *
+ *	For details check readMe.txt.......	
+ *
+ *	Abeer Rajhi and Xingdong  		
+ *************************************************************************/
 
 //SHIPS
 
