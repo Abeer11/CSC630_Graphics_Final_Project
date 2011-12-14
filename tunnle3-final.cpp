@@ -793,7 +793,7 @@ void display(void)
 }
 
 void liveSquare()
-{
+{//draw the heart templet..
 	glBegin(GL_QUADS);
 	glVertex3f(0,0,0);
 	glVertex3f(0,50,0);
