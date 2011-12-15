@@ -597,7 +597,7 @@ void init()
 	gluQuadricCallback(qobj, GLU_ERROR, errorCallback);
 	
 	glColor3f(0.90, 0.90, 0.90);
-	glEnable (GL_BLEND);//enable blending 
+	glEnable (GL_BLEND);//enable blending
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//to control how the blending occurs.
 	
 	glEnable(GL_DEPTH_TEST);//enable depth	
@@ -805,7 +805,7 @@ void liveSquare()
 //draw lives icons
 void remainingLives(int lives)
 {
-	
+	//we don't use break here, since we will draw the remining hearts.
 	switch(lives)
 	{
 		case 3:
@@ -871,20 +871,17 @@ double ttime = 0;
 double timeBeginJump = 0;
 /**************/
 
-void zJump(int value){
-	
-    ttime = (glutGet(GLUT_ELAPSED_TIME)-timeBeginJump) / 900.0;
-	
-    float posSin = fabs(sin(freq*ttime*2*PI));
-    ball_Z= amplitude+3*amplitude*posSin/exp(decay*ttime);
-
-	if(ttime < 8){
-		glutTimerFunc(1, zJump, 0);
-	}else {
-		DoneJumping = true;
-	}
-
-	
+void zJump(){
+	if (!DoneJumping) {
+        ttime = (glutGet(GLUT_ELAPSED_TIME)-timeBeginJump) / 900.0;
+        
+        float posSin = fabs(sin(freq*ttime*2*PI));
+        ball_Z= amplitude+3*amplitude*posSin/exp(decay*ttime);
+        
+        if(ttime >= 8){
+            DoneJumping = true;
+        }
+    }
 }
 
 //this function to track the input from keyboard
@@ -908,10 +905,7 @@ void normalKeys(unsigned char key, int x, int y)
 			case ' ':
 			if(ball_Z<=Z_HEIGHT+0.4){
 				timeBeginJump = glutGet(GLUT_ELAPSED_TIME);
-				if(DoneJumping)
-					zJump(0);
 				DoneJumping=false;
-
 			}
 			
 			break;
@@ -1003,6 +997,7 @@ void rotateBall(int value)
 void MoveBallForward(int value)
 {
     moving();
+    zJump();
 	glutTimerFunc(1, MoveBallForward, 0);
 }
 
