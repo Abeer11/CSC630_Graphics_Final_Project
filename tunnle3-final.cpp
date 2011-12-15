@@ -497,10 +497,14 @@ void face(void)
 
 void eye(void)
 {
+	pauseScreen=true;
 	//glPushMatrix();
 	glColor3f(1.00, 1.00, 1.00);
 	glutSolidSphere(0.5, NO_SIDES, NO_FACES);//whiteBall
-	glTranslatef(-xMouse+0.5, +0.35, yMouse-0.5);
+	glRotatef(xMouse*PI*PI*2, 0, 0, 1);
+	glRotatef((yMouse*PI*PI*10+yMouse) , 1, 0, 0);
+	//glTranslatef(-xMouse+0.5, +0.35, yMouse-0.5);
+	glTranslatef(0.0, 0.35, 0.1);
 	glColor3f(0.00, 0.00, 0.00);
 	glutSolidSphere(0.18, NO_SIDES, NO_FACES);//blackBall
 	//glPopMatrix();
@@ -644,17 +648,17 @@ void init()
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
 	
 	
-	Image* image = loadBMP("vtr3.bmp");//make the image file into image object
+	Image* image = loadBMP("rightWall.bmp");//make the image file into image object
 	_textureId = loadTexture(image);//load the the image as a texture
 	delete image;					//then delete the image, because the image already 
 									//sorted in the pixel array
 	
-	image = loadBMP("vtr5.bmp");//make the image file into image object
+	image = loadBMP("Ground.bmp");//make the image file into image object
 	_textureId2 = loadTexture(image);//load the the image as a texture
 	delete image;					//then delete the image, because the image already 
 									//sorted in the pixel array
 	
-	image = loadBMP("wall2.bmp");//make the image file into image object
+	image = loadBMP("LeftWall.bmp");//make the image file into image object
 	_textureId3 = loadTexture(image);//load the the image as a texture
 	delete image;
 	
@@ -778,10 +782,10 @@ void display(void)
 
 	drawBall();
 	
-    glPushMatrix();
-    glRotated(-90, 0, 0, 1);
+	glPushMatrix();
+	glRotatef(270, 0, 0, 1);
 	drawPinkBall();
-    glPopMatrix();
+	glPopMatrix();
 	
 	coins();
 	
@@ -903,11 +907,8 @@ void normalKeys(unsigned char key, int x, int y)
 {	
 	if(!pauseScreen)//do not activat the keyboard function
 		//unless the key is P or p.
-    {    
-        if(fallingdown)
-            return;
-        switch (key) 
-        {
+	switch (key) 
+	{
 		case 27 :
 		case 'q':
 		case 'Q':
@@ -927,10 +928,13 @@ void normalKeys(unsigned char key, int x, int y)
 			
 			break;
 			
-        }
-    }
-	else if(pauseScreen && (key=='p' || key=='P'))
+	}
+	else if( (key=='p' || key=='P'))
 		pauseScreen=false;
+	
+	else if( (key==27 || key=='q') || (key=='Q') )
+		exit(0);
+
 }
 
 //this function to track the special key input from keyboard
@@ -1031,14 +1035,9 @@ void detectFalldown(){
 }
 
 void MoveBallForward(int value)
-{
-    zJump();
-    detectCollision();
-    if(!fallingdown)
-    {   
-        detectFalldown();
-        moving();
-    }
+{	
+	if(!pauseScreen)
+    moving();
 	glutTimerFunc(1, MoveBallForward, 0);
 }
 
