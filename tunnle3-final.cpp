@@ -56,8 +56,8 @@
 #define SOLID 1
 #define HOLE 0
 
-#define COLLECTED 0
-#define NOTCOLLECTED 1
+#define COLLECTED 1
+#define NOTCOLLECTED 2
 
 
 #include "imageloader.h"
@@ -85,8 +85,8 @@ void MoveBallForward(int);
 void setOrthographicProjection(void);
 void resetPerspectiveProjection(void);
 void renderBitmapString(float, float, void *,char *);
-void textInfoOnScreen(int);
-void remainingLives(int);
+void textInfoOnScreen();
+void remainingLives();
 
 //======================================================//
 //===============The gloable variables==================//
@@ -157,8 +157,9 @@ float groundBricksArray[BRICK_NUMBER_OF_GROUND][3][3];
 
 float coinsdataArray[BRICK_NUMBER_OF_GROUND][3][3];
 
-bool firstTime=true;
-
+double dollars = 0.0;
+int lives = 3;
+bool fallingdown = false;
 
 //======================================================//
 //===================== Functions ======================//
@@ -292,7 +293,6 @@ void generateCoins(void){
                 coinsdataArray[i][j][0] = groundBricksArray[i][j][0];
                 coinsdataArray[i][j][1] = groundBricksArray[i][j][1];
                 coinsdataArray[i][j][2] = NOTCOLLECTED;
-                
             }
         }
     }
@@ -376,8 +376,8 @@ void coins()
 {
 	for(int i = 0;i<BRICK_NUMBER_OF_GROUND;i++){
         for (int j=0; j<3; j++) {
-            if(coinsdataArray[i][j][2]==COLLECTED)
-                continue;
+            if(coinsdataArray[i][j][2]==NOTCOLLECTED)
+            {
             glLightfv (GL_LIGHT0, GL_SPECULAR, SpecularLight); 
             glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,coinColor );
             glPushMatrix();
@@ -410,6 +410,7 @@ void coins()
             glPopMatrix();
             glPopMatrix();
             glPopMatrix();
+            }
         }
     }
 }
@@ -678,7 +679,7 @@ void moving()
 	if((sideMove>0 && ball_X<17.96) ||( sideMove<0 && ball_X>-17.80))
 		ball_X  = ball_X  + sideMove;
 	
-	ball_Y = ball_Y + deltaMove;
+	ball_Y += deltaMove;
 	
 	glLoadIdentity();
 	camera1();	
@@ -777,18 +778,19 @@ void display(void)
 
 	drawBall();
 	
+    glPushMatrix();
+    glRotated(-90, 0, 0, 1);
 	drawPinkBall();
+    glPopMatrix();
 	
 	coins();
-	
-	firstTime=false;
 	
 	glColor3f(1.0, 0.0, 0.0);
     setOrthographicProjection();
     glPushMatrix();
     glLoadIdentity();
-	textInfoOnScreen(30);
-	remainingLives(3);
+	textInfoOnScreen();
+	remainingLives();
 	glPopMatrix();
     resetPerspectiveProjection();
 	
@@ -815,7 +817,7 @@ void liveSquare()
 	
 }	
 //draw lives icons
-void remainingLives(int lives)
+void remainingLives()
 {
 	//we don't use break here, since we will draw the remining hearts.
 	switch(lives)
@@ -835,13 +837,13 @@ void remainingLives(int lives)
 	}	
 }
 
-void textInfoOnScreen(int collectdCoins)
+void textInfoOnScreen()
 {	
 	glColor3f(1,1,1);
 	int len, i;
 	char string[30];
 	
-	sprintf(string,"You have :%d.00$", collectdCoins);//to convert the digit into string
+	sprintf(string,"You have :%d.00$", (int)dollars);//to convert the digit into string
 	
 	len = (int) strlen(string);//to get the length of the text
 	
@@ -901,8 +903,11 @@ void normalKeys(unsigned char key, int x, int y)
 {	
 	if(!pauseScreen)//do not activat the keyboard function
 		//unless the key is P or p.
-		switch (key) 
-	{
+    {    
+        if(fallingdown)
+            return;
+        switch (key) 
+        {
 		case 27 :
 		case 'q':
 		case 'Q':
@@ -922,7 +927,8 @@ void normalKeys(unsigned char key, int x, int y)
 			
 			break;
 			
-	}
+        }
+    }
 	else if(pauseScreen && (key=='p' || key=='P'))
 		pauseScreen=false;
 }
@@ -930,7 +936,7 @@ void normalKeys(unsigned char key, int x, int y)
 //this function to track the special key input from keyboard
 void specialKeys(int key, int x, int y)
 {
-	if(!pauseScreen)
+	if(!pauseScreen&&!fallingdown)
 		switch (key) 
 	{
         case GLUT_KEY_LEFT  : sideMove= 0.5 ;break;//turn left
@@ -1007,14 +1013,32 @@ void rotateBall(int value)
 }
 
 void detectCollision(){
-    
+    int x = (ball_X+3)/14+1;
+    int y = -ball_Y/14;
+    if (coinsdataArray[y][x][2]==NOTCOLLECTED) {
+        coinsdataArray[y][x][2]=COLLECTED;
+        dollars++;
+    }
+}
+
+void detectFalldown(){
+    int x = (ball_X+3)/14+1;
+    int y = -ball_Y/14;
+    if (groundBricksArray[y][x][2]==HOLE) {
+        fallingdown=true;
+        lives--;
+    }
 }
 
 void MoveBallForward(int value)
 {
     zJump();
-    moving();
     detectCollision();
+    if(!fallingdown)
+    {   
+        detectFalldown();
+        moving();
+    }
 	glutTimerFunc(1, MoveBallForward, 0);
 }
 
