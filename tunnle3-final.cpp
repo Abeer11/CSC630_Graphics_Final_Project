@@ -93,6 +93,7 @@ GLuint _textureId, _textureId3; //The id of wall's texture
 
 GLuint _textureId2;				//The id of the texture of ground
 
+GLuint _textureId4;				//this id of the texture for the heart.
 int h,w;						//the window width and height
 
 float yEndOfGround=-(BRICK_NUMBER_OF_GROUND*BRICK_SIZE);
@@ -409,7 +410,7 @@ void coins()
 	glLightfv (GL_LIGHT0, GL_SPECULAR, SpecularLight); 
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,coinColor );
 	glPushMatrix();
-	//glTranslatef(-3, 1, 2);
+	glTranslatef(-3, 1, 2);
 	glPushMatrix();
 	glRotatef(-90, ROTATE_ON_X, 0, 0);
 	glColor3f(1,.8,0);
@@ -618,7 +619,7 @@ void createCircle(float radius )
 	// whick is a point on the Circle
 	glBegin(GL_TRIANGLE_FAN);
 	
-	glNormal3d(-1, 0, 0);
+	glNormal3d(0, -1, 0);
 	for (i=0; i <= 360; i+=4)
 	{
 		float degInRad = i*DEG2RAD;
@@ -681,6 +682,10 @@ void init()
 	
 	image = loadBMP("wall2.bmp");//make the image file into image object
 	_textureId3 = loadTexture(image);//load the the image as a texture
+	delete image;
+	
+	image = loadBMP("heart.bmp");//make the image file into image object
+	_textureId4 = loadTexture(image);//load the the image as a texture
 	delete image;
 	
 	generateGround();
@@ -810,7 +815,7 @@ void display(void)
     glPushMatrix();
     glLoadIdentity();
 	textInfoOnScreen(30);
-	//remainingLives();
+	remainingLives(3);
 	glPopMatrix();
     resetPerspectiveProjection();
 	
@@ -819,10 +824,19 @@ void display(void)
 
 void liveSquare()
 {//draw the heart templet..
+	
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, _textureId4);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	
 	glBegin(GL_QUADS);
+	glTexCoord2f(1.0, 0.0);
 	glVertex3f(0,0,0);
+	glTexCoord2f(1.0, 1.0);
 	glVertex3f(0,50,0);
+	glTexCoord2f(0.0, 1.0);
 	glVertex3f(50,50,0);
+	glTexCoord2f(0.0, 0.0);
 	glVertex3f(50,0,0);
 	glEnd();
 	
@@ -831,17 +845,20 @@ void liveSquare()
 void remainingLives(int lives)
 {
 	
-	if(lives==1)
+	switch(lives)
 	{
-		
-	}
-	if(lives==2)
-	{
-		
-	}
-	if(lives==3)
-	{
-		
+		case 3:
+			glPushMatrix();
+			glTranslatef(100, 0, 0);
+			liveSquare();
+			glPopMatrix();
+		case 2:
+			glPushMatrix();
+			glTranslatef(50, 0, 0);
+			liveSquare();
+			glPopMatrix();
+		case 1:
+			liveSquare();
 	}	
 }
 
@@ -855,7 +872,7 @@ void textInfoOnScreen(int collectdCoins)
 	
 	len = (int) strlen(string);//to get the length of the text
 	
-	glRasterPos2f(20,20);//to set the text position on the screen
+	glRasterPos2f(20,70);//to set the text position on the screen
 	//======================================================================//
 	
 	for (i = 0; i < len; i++) //this loop to draw our text on the output screen
@@ -954,11 +971,12 @@ void specialKeys(int key, int x, int y)
 	{
         case GLUT_KEY_LEFT  : sideMove= 0.5 ;break;//turn left
         case GLUT_KEY_RIGHT : sideMove= -0.5;break;//turn right
-        case GLUT_KEY_UP    : velocity-=0.05;break;//increase the velocity(it
+        case GLUT_KEY_UP    : velocity= -0.9;break;//increase the velocity(it
 							//is in negative value, because the ball heading 
 							//toward the negative y
-        case GLUT_KEY_DOWN  :  velocity+=0.05;break;//decrease the velocity value.
+        case GLUT_KEY_DOWN  :  velocity =-0.1;break;//decrease the velocity value.
 			break;
+			
     }
 }
 
@@ -975,11 +993,9 @@ void releaseSpecialKeys(int key, int x, int y)
 		case GLUT_KEY_RIGHT : 
 			sideMove = 0.00;
 			break;
-		case GLUT_KEY_UP :    
-			//deltaMove = 0.00;
-			break;
-		case GLUT_KEY_DOWN : 
-			//deltaMove = 0.00;
+		case GLUT_KEY_UP  :    
+		case GLUT_KEY_DOWN: 
+			velocity=-0.3;
 			break;
 	}
 }
