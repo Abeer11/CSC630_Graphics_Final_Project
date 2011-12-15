@@ -41,8 +41,8 @@
 #define NO_COINS 8					/*number of coins */
 
 #define BRICK_SIZE 14
-#define BRICK_NUMBER_OF_GROUND 100
-#define COIN_NUMBER 20
+#define BRICK_NUMBER_OF_GROUND 200
+#define COIN_NUMBER 30
 
 #define Z_HEIGHT 1.9
 
@@ -102,8 +102,6 @@ float xBeginOfGround=-21, yBeginOfGround=0, zEndOfGround=-14;
 
 char textArray[50];//to stor the text information(the coins
 					//that have been colected 
-
-float counter=-1000;
 
 int insideTheWindow=0;
 
@@ -581,7 +579,7 @@ void createCircle(float radius )
 	// whick is a point on the Circle
 	glBegin(GL_TRIANGLE_FAN);
 	
-	glNormal3d(-1, 0, 0);
+	glNormal3d(0, -1, 0);
 	for (i=0; i <= 360; i+=4)
 	{
 		float degInRad = i*DEG2RAD;
@@ -890,17 +888,14 @@ void normalKeys(unsigned char key, int x, int y)
 			break;
 			
 			case ' ':
-			if(ball_Z<=Z_HEIGHT+0.3){
+			if(ball_Z<=Z_HEIGHT+0.4){
 				timeBeginJump = glutGet(GLUT_ELAPSED_TIME);
 				if(DoneJumping)
 					zJump(0);
 				DoneJumping=false;
 
 			}
-			//if (DoneJumping) 
-//			{
-                
-            //}
+			
 			break;
 			
 	}
