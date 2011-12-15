@@ -41,8 +41,8 @@
 #define NO_COINS 8					/*number of coins */
 
 #define BRICK_SIZE 14
-#define BRICK_NUMBER_OF_GROUND 200
-#define COIN_NUMBER 30
+#define BRICK_NUMBER_OF_GROUND 100
+#define COIN_NUMBER 20
 
 #define Z_HEIGHT 1.9
 
@@ -55,6 +55,9 @@
 
 #define SOLID 1
 #define HOLE 0
+
+#define COLLECTED 0
+#define NOTCOLLECTED 1
 
 
 #include "imageloader.h"
@@ -150,8 +153,9 @@ GLUquadricObj* qobj;
 
 const float DEG2RAD = 3.14159/180;
 
-float groundBricksArray[BRICK_NUMBER_OF_GROUND][3];
-float coinsPosArray[COIN_NUMBER][2];
+float groundBricksArray[BRICK_NUMBER_OF_GROUND][3][3];
+
+float coinsdataArray[BRICK_NUMBER_OF_GROUND][3][3];
 
 bool firstTime=true;
 
@@ -264,18 +268,15 @@ void readMap(char* filestr){
     }
     
     int brick;
-    int brickindex=0;
-    int readcounter = 0;
-    
-    while (readcounter<BRICK_NUMBER_OF_GROUND) {
-        fin>>brick;
-        if  (brick==SOLID){
-            groundBricksArray[brickindex][0] = (readcounter%3-1)*14;
-            groundBricksArray[brickindex++][1] = ((readcounter/3))*-14;
-        }
-        readcounter++;
-    }
 
+    for (int i=0; i<BRICK_NUMBER_OF_GROUND; i++) {
+        for (int j=0; j<3; j++) {
+            fin >> brick;
+            groundBricksArray[i][j][0] = (j-1)*14;
+            groundBricksArray[i][j][1] = i*-14;
+            groundBricksArray[i][j][2] = brick;
+        }
+    }
     fin.close();
 }
 
@@ -285,10 +286,14 @@ void generateGround(void)
 }
 
 void generateCoins(void){
-    for(int bindex=0,cindex=0;bindex<BRICK_NUMBER_OF_GROUND&&cindex<COIN_NUMBER;bindex++){
-        if(random()%BRICK_NUMBER_OF_GROUND<COIN_NUMBER){
-            coinsPosArray[cindex][0] = groundBricksArray[bindex][0];
-            coinsPosArray[cindex++][1] = groundBricksArray[bindex][1];
+    for(int i=0;i<BRICK_NUMBER_OF_GROUND;i++){
+        for (int j=0; j<3; j++) {
+            if(groundBricksArray[i][j][2] && (random()%BRICK_NUMBER_OF_GROUND)<COIN_NUMBER){
+                coinsdataArray[i][j][0] = groundBricksArray[i][j][0];
+                coinsdataArray[i][j][1] = groundBricksArray[i][j][1];
+                coinsdataArray[i][j][2] = NOTCOLLECTED;
+                
+            }
         }
     }
 }
@@ -298,11 +303,14 @@ void ground()
 {
 	for(int i=0; i<BRICK_NUMBER_OF_GROUND; i++)
 	{
-		glPushMatrix();
-		glTranslatef(groundBricksArray[i][0], groundBricksArray[i][1], -7);
-		glutSolidCube1(BRICK_SIZE);
-		glPopMatrix();
-		
+        for (int j=0; j<3; j++) {
+            if(groundBricksArray[i][j][2]){//solid, draw the brick
+                glPushMatrix();
+                glTranslatef(groundBricksArray[i][j][0], groundBricksArray[i][j][1], -7);
+                glutSolidCube1(BRICK_SIZE);
+                glPopMatrix();
+            }
+        }
 	}
 	
 }
@@ -366,39 +374,43 @@ GLfloat SpecularLight[] = {1.0, 1.0, 1.0};
 
 void coins()
 {
-	for(int i = 0;i<COIN_NUMBER;i++){
-        glLightfv (GL_LIGHT0, GL_SPECULAR, SpecularLight); 
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,coinColor );
-        glPushMatrix();
-        glTranslatef(coinsPosArray[i][0], coinsPosArray[i][1], 2);
-        glPushMatrix();
-        glRotatef(-90, ROTATE_ON_X, 0, 0);
-        glColor3f(1,.8,0);
-        glPushMatrix();
-        gluQuadricDrawStyle(qobj, GLU_FILL); /* flat shaded */
-        gluQuadricNormals(qobj, GLU_SMOOTH);
-        gluCylinder(qobj, 1.0, 1.0, 0.5, 40, 3);
-        glPopMatrix();
-        
-        
-        glPushMatrix();
-        glTranslatef(0.00, 0.00, 0.50);
-        glPushMatrix();
-        glRotatef(0, 0, ROTATE_ON_Y, 0);
-        
-        
-        createCircle(1);
-        glPopMatrix();
-        glPopMatrix();
-        
-        glPushMatrix();
-        glPushMatrix();
-        glColor3fv(coinColor);
-        createCircle(1);
-        glPopMatrix();
-        glPopMatrix();
-        glPopMatrix();
-        glPopMatrix();
+	for(int i = 0;i<BRICK_NUMBER_OF_GROUND;i++){
+        for (int j=0; j<3; j++) {
+            if(coinsdataArray[i][j][2]==COLLECTED)
+                continue;
+            glLightfv (GL_LIGHT0, GL_SPECULAR, SpecularLight); 
+            glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,coinColor );
+            glPushMatrix();
+            glTranslatef(coinsdataArray[i][j][0], coinsdataArray[i][j][1], 2);
+            glPushMatrix();
+            glRotatef(-90, ROTATE_ON_X, 0, 0);
+            glColor3f(1,.8,0);
+            glPushMatrix();
+            gluQuadricDrawStyle(qobj, GLU_FILL); /* flat shaded */
+            gluQuadricNormals(qobj, GLU_SMOOTH);
+            gluCylinder(qobj, 1.0, 1.0, 0.5, 40, 3);
+            glPopMatrix();
+            
+            
+            glPushMatrix();
+            glTranslatef(0.00, 0.00, 0.50);
+            glPushMatrix();
+            glRotatef(0, 0, ROTATE_ON_Y, 0);
+            
+            
+            createCircle(1);
+            glPopMatrix();
+            glPopMatrix();
+            
+            glPushMatrix();
+            glPushMatrix();
+            glColor3fv(coinColor);
+            createCircle(1);
+            glPopMatrix();
+            glPopMatrix();
+            glPopMatrix();
+            glPopMatrix();
+        }
     }
 }
 
@@ -994,10 +1006,15 @@ void rotateBall(int value)
 
 }
 
+void detectCollision(){
+    
+}
+
 void MoveBallForward(int value)
 {
-    moving();
     zJump();
+    moving();
+    detectCollision();
 	glutTimerFunc(1, MoveBallForward, 0);
 }
 
@@ -1029,7 +1046,7 @@ int main(int argc, char **argv)
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowPosition(100,100);
     glutInitWindowSize(800,500);
-    glutCreateWindow("Assignment 3");
+    glutCreateWindow("Mr.Ball Game");
 	
     initWindow();
 	
