@@ -42,6 +42,7 @@
 
 #define BRICK_SIZE 14
 #define BRICK_NUMBER_OF_GROUND 100
+#define COIN_NUMBER 20
 
 #define Z_HEIGHT 1.9
 
@@ -123,7 +124,7 @@ float	sideMove=0.0;
 
 float	rotateAngleToMoveForwad=1.00;	//the angle 
 
-bool DoneJumping=true;
+bool    DoneJumping=true;
 
 float	ratio;	//the ratio of window width to its height
 
@@ -151,10 +152,10 @@ GLUquadricObj* qobj;
 const float DEG2RAD = 3.14159/180;
 
 float groundBricksArray[BRICK_NUMBER_OF_GROUND][3];
+float coinsPosArray[COIN_NUMBER][2];
 
 bool firstTime=true;
 
-int random1;
 
 //======================================================//
 //===================== Functions ======================//
@@ -258,28 +259,39 @@ void drawPinkBall()
 void readMap(char* filestr){
     
     ifstream fin(filestr);
+     
+	if(fin.fail()){
+        return;
+    }
     
     int brick;
-    int counter =0;
-    for (int i=0; i<BRICK_NUMBER_OF_GROUND; i++) {
-        for (int j=-1; j<2; j++) {
-            fin>>brick;
-            if  (brick){
-                groundBricksArray[counter][0] = j*14;
-                groundBricksArray[counter++][1] = i*-14;
-            }
+    int brickindex=0;
+    int readcounter = 0;
+    
+    while (readcounter<BRICK_NUMBER_OF_GROUND) {
+        fin>>brick;
+        if  (brick==SOLID){
+            groundBricksArray[brickindex][0] = (readcounter%3-1)*14;
+            groundBricksArray[brickindex++][1] = ((readcounter/3))*-14;
         }
-        //fin>>groundBricksArray[i][0]>>groundBricksArray[i][1]>>groundBricksArray[i][2];
+        readcounter++;
     }
+
     fin.close();
 }
+
 void generateGround(void)
 {
     readMap("mapdata");
 }
 
 void generateCoins(void){
-	
+    for(int bindex=0,cindex=0;bindex<BRICK_NUMBER_OF_GROUND&&cindex<COIN_NUMBER;bindex++){
+        if(random()%BRICK_NUMBER_OF_GROUND<COIN_NUMBER){
+            coinsPosArray[cindex][0] = groundBricksArray[bindex][0];
+            coinsPosArray[cindex++][1] = groundBricksArray[bindex][1];
+        }
+    }
 }
 
 //to set the values of the ground coodinate, and then draw it.
@@ -350,43 +362,45 @@ void glutSolidCube1(GLdouble size)
 	drawBox(size, GL_QUADS);
 }
 
+GLfloat coinColor[]={1,.8,0};
+GLfloat SpecularLight[] = {1.0, 1.0, 1.0};
+
 void coins()
 {
-	float coinColor[]={1,.8,0};
-	GLfloat SpecularLight[] = {1.0, 1.0, 1.0};
-	
-	glLightfv (GL_LIGHT0, GL_SPECULAR, SpecularLight); 
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,coinColor );
-	glPushMatrix();
-	glTranslatef(-3, 1, 2);
-	glPushMatrix();
-	glRotatef(-90, ROTATE_ON_X, 0, 0);
-	glColor3f(1,.8,0);
-	glPushMatrix();
-	gluQuadricDrawStyle(qobj, GLU_FILL); /* flat shaded */
-	gluQuadricNormals(qobj, GLU_SMOOTH);
-	gluCylinder(qobj, 1.0, 1.0, 0.5, 40, 3);
-	glPopMatrix();
-	
-	
-	glPushMatrix();
-	glTranslatef(0.00, 0.00, 0.50);
-	glPushMatrix();
-	glRotatef(0, 0, ROTATE_ON_Y, 0);
-	
-	
-	createCircle(1);
-	glPopMatrix();
-	glPopMatrix();
-	
-	glPushMatrix();
-	glPushMatrix();
-	glColor3f(1,.8,0);
-	createCircle(1);
-	glPopMatrix();
-	glPopMatrix();
-	glPopMatrix();
-	glPopMatrix();
+	for(int i = 0;i<COIN_NUMBER;i++){
+        glLightfv (GL_LIGHT0, GL_SPECULAR, SpecularLight); 
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,coinColor );
+        glPushMatrix();
+        glTranslatef(coinsPosArray[i][0], coinsPosArray[i][1], 2);
+        glPushMatrix();
+        glRotatef(-90, ROTATE_ON_X, 0, 0);
+        glColor3f(1,.8,0);
+        glPushMatrix();
+        gluQuadricDrawStyle(qobj, GLU_FILL); /* flat shaded */
+        gluQuadricNormals(qobj, GLU_SMOOTH);
+        gluCylinder(qobj, 1.0, 1.0, 0.5, 40, 3);
+        glPopMatrix();
+        
+        
+        glPushMatrix();
+        glTranslatef(0.00, 0.00, 0.50);
+        glPushMatrix();
+        glRotatef(0, 0, ROTATE_ON_Y, 0);
+        
+        
+        createCircle(1);
+        glPopMatrix();
+        glPopMatrix();
+        
+        glPushMatrix();
+        glPushMatrix();
+        glColor3fv(coinColor);
+        createCircle(1);
+        glPopMatrix();
+        glPopMatrix();
+        glPopMatrix();
+        glPopMatrix();
+    }
 }
 
 void ribbon(void)
